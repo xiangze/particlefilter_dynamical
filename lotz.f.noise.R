@@ -3,8 +3,7 @@ lotz.params <- list(dl = 10,
                ro = 28)
 
 lotz.noise <- function(t, y,v,p=lotz.params){
-  rnd <- rnorm(3,v)
-  y <- y+rnd
+  y <- y+rnorm(3,0,v)
   dl <- p[['dl']]
   ro <- p[['ro']]
   bt <- p[['bt']]
