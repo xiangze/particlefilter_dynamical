@@ -1,18 +1,18 @@
 source("lotz.f.noise.R")
-source("rossler.noise.R")
+source("rossler.noize.R")
 source("resample.R")
 
-dt <- 0.001
-N <- 30
-times <- 4000
-interval <- 10
+dt <- 0.02
+N <- 100
+times <- 5000
+interval <- 50
 
 lag <- 1
 
-rv <- 0.001 #original noise
+rv <- 0.0 #original noise
 xv <- 0.01  #system noise var
-yv <- 0.3   #obesebation noise var
-nv <- 0.01 # of PF
+yv <- 0.03   #obesebation noise var
+nv <- 0.001 # of PF
 
 psize <- c(-40,40)
 preshow <- T
@@ -22,17 +22,22 @@ lotz.params <- list(dl = 10,
                bt = 8/3,
                ro = 28)
 
-for(N in c(10)){
-  for(ro in c(331)){
+rossler.params <- list(a = 0.1,
+               b = 0.1,
+               c = 18)
+
+for(N in c(30)){
+  for(ro in c(4,5.7,14)){
+#  for(ro in c(331)){
 #  for(ro in c(16,28,200)){  
 
-    lotz.params$c <- ro
-    lz <- function(x,v){x+dt*lotz.noise(0,x,v,lotz.params)}
+    rossler.params$c <- ro
+    lz <- function(x,v){x+dt*rossler.noise(0,x,v,rossler.params)}
+    pname <-paste("ros",N,ro,interval,".png",sep="_")
     
 #    lotz.params$ro <- ro
 #    lz <- function(x,v){x+dt*lotz.noise(0,x,v,lotz.params)}
-    
-    pname <-paste(N,lotz.params$ro,interval,".png",sep="_")
+#    pname <-paste(N,lotz.params$ro,interval,".png",sep="_")
 
 #make original(hidden) time series (x) with system noise
 #observed sequence :y
@@ -48,17 +53,18 @@ for (t in 2:times){
 }
 
 if(preshow){
-  png(paste("org_phase",pname,sep="_"))
-  plot(y[,2],y[,3], type='l',xlim=psize,ylim=psize,col="red",xlab="x",ylab="y")
-  par(new=T)
-  plot(xo[,2],xo[,3], type='l',xlim=psize,ylim=psize, axes=F,xlab="",ylab="")
-  dev.off()
+##   png(paste("org_phase",pname,sep="_"))
+##   plot(y[,2],y[,3], type='l',xlim=psize,ylim=psize,col="red",xlab="x",ylab="y")
+##   par(new=T)
+##   plot(xo[,2],xo[,3], type='l',xlim=psize,ylim=psize, axes=F,xlab="",ylab="")
+##   dev.off()
 
   png(paste("org_time",pname,sep="_"))
   plot(seq(1,times),xo[,2], type='l', axes=F,xlab="",ylab="")
   par(new=T)
   plot(seq(1,times,by=interval),y[,2],type='l',col="red",xlab="x",ylab="y")
   dev.off()
+  
 }
 
 #prediction by particles 
@@ -90,22 +96,33 @@ for (t in 2:times){
 }
 
 if(show){
-  png(paste("particle_phase",N,lotz.params$ro,interval,".png",sep="_"))
-  for (i in 1:N){
-    plot(x[,i,2],x[,i,3], type='l',xlim=psize,ylim=psize, axes=F,xlab="",ylab="")
-    par(new=T)
-  }
-  plot(y[,2],y[,3], type='l',xlim=psize,ylim=psize,col="red",ann=T)
-  dev.off()
+##   png(paste("particle_phase",pname,sep="_"))
+##   for (i in 1:N){
+##     plot(x[,i,2],x[,i,3], type='l',xlim=psize,ylim=psize, axes=F,xlab="",ylab="")
+##     par(new=T)
+##   }
+##   plot(y[,2],y[,3], type='l',xlim=psize,ylim=psize,col="red",ann=T)
+##   dev.off()
 
-  png(paste("particle_time",N,lotz.params$ro,interval,".png",sep="_"))
+  png(paste("particle_time",pname,sep="_"))
   for (i in 1:N){
     plot(seq(1,times),x[,i,2], type='l', axes=F,xlab="",ylab="")
     par(new=T)
   }
   plot(seq(1,times,by=interval),y[,2],type='l',col="red",ann=T)
   dev.off()
+
+  xa1 <- array(dim=times)
+  for (t in 1:times){
+    xa1[t] <- sum(x[t,,2])
+  }
+  
+  png(paste("particle_time_A",pname,sep="_"))
+  plot(seq(1,times),xa1-y[,2], type='l')
+  dev.off()
+ 
 }
+    
   }
 }
 
