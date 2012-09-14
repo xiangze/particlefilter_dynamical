@@ -2,13 +2,12 @@ source("lotz.f.noise.R")
 source("rossler.noize.R")
 source("resample.R")
 
-#dt <- 0.02
 dt <- 0.01
 #dt <- 0.001
-N <- 100
-times <- 10000
-interval <- 100
 
+
+N <- 100
+interval <- 100
 lag <- 1
 
 rv <- 0.0 #original noise var
@@ -22,6 +21,7 @@ show <- T
 
 type <- "ros"
 rparams <- c(4,5.7,14,18)
+times <- 30000
 #type <- "loz"
 #rparams <- c(4,16,28,331)
 
